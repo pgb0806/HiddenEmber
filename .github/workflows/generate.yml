@@ -25,7 +25,7 @@ jobs:
           echo "Mood chosen: $MOOD"
 
           # pick random video from mood/video folder
-          VIDEO=$(find "assets/$MOOD/video" -type f | shuf -n1)
+          VIDEO=$(find "assets/$MOOD/background" -type f | shuf -n1)
           echo "Video chosen: $VIDEO"
 
           # pick random music from mood/music folder
