@@ -18,17 +18,17 @@ jobs:
         id: pick
         run: |
           # moods list
-          moods=("Resolute")
-          #  "Serene" "Inspirational" "Wise & Reflective" "Cautionary" "Sorrowful" "Humble & Grounded" "Defiant & Rebellious" "Compassionate"
+          moods=("Resolute" )
+          # "Serene" "Inspirational" "Wise & Reflective" "Cautionary" "Sorrowful" "Humble & Grounded" "Defiant & Rebellious" "Compassionate"
           # pick random mood
           MOOD="${moods[$((RANDOM % ${#moods[@]}))]}"
           echo "Mood chosen: $MOOD"
 
-          # pick random video
-          VIDEO=$(find "assets/$MOOD/background" -type f | shuf -n1)
+          # pick random video from mood/video folder
+          VIDEO=$(find "assets/$MOOD/video" -type f | shuf -n1)
           echo "Video chosen: $VIDEO"
 
-          # pick random music
+          # pick random music from mood/music folder
           MUSIC=$(find "assets/$MOOD/music" -type f | shuf -n1)
           echo "Music chosen: $MUSIC"
 
@@ -36,6 +36,7 @@ jobs:
           echo "mood=$MOOD" >> $GITHUB_OUTPUT
           echo "video=$VIDEO" >> $GITHUB_OUTPUT
           echo "music=$MUSIC" >> $GITHUB_OUTPUT
+
 
       - name: Generate Final Video
         run: |
