@@ -1,0 +1,51 @@
+name: Generate Wisdom Shorts
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: "Main wisdom text"
+        required: true
+        type: string
+      author:
+        description: "Author (optional)"
+        required: false
+        type: string
+      reference:
+        description: "Reference (optional)"
+        required: false
+        type: string
+      mood:
+        description: "Mood to drive video choice"
+        required: false
+        default: "Resolute"
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup
+        run: sudo apt-get update && sudo apt-get install -y jq  bc ffmpeg
+
+      - name: Generate Wisdom Video
+        run: |
+          echo '{ 
+            "text": "${{ github.event.inputs.text }}",
+            "author": "${{ github.event.inputs.author }}",
+            "reference": "${{ github.event.inputs.reference }}",
+            "mood": "${{ github.event.inputs.mood }}"
+          }' > input.json
+
+          chmod +x ./test_wisdom.sh
+          ./test_wisdom.sh
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: final
+          path: final.mp4

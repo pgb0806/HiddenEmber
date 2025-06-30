@@ -1,0 +1,83 @@
+{
+  "Resolute": {
+    "font": "fonts/Anton.ttf",
+    "fontColor": "white",
+    "textPosition": "center",
+    "fadeIn": 1,
+    "fadeOut": 1,
+    "filters": "eq=contrast=1.2:saturation=1.2",
+    "transitions": "fade"
+  },
+  "Serene": {
+    "font": "fonts/GreatVibes-Regular.ttf",
+    "fontColor": "#B2DFDB",
+    "textPosition": "bottom",
+    "fadeIn": 2,
+    "fadeOut": 2,
+    "filters": "eq=brightness=0.9:saturation=0.8",
+    "transitions": "crossfade"
+  },
+  "Inspirational": {
+    "font": "fonts/Oswald-Regular.ttf",
+    "fontColor": "yellow",
+    "textPosition": "top",
+    "fadeIn": 0.5,
+    "fadeOut": 0.5,
+    "filters": "eq=contrast=1.4:saturation=1.4",
+    "transitions": "slide"
+  },
+  "Wise & Reflective": {
+    "font": "fonts/Merriweather-Regular.ttf",
+    "fontColor": "#D7CCC8",
+    "textPosition": "center",
+    "fadeIn": 1.5,
+    "fadeOut": 1.5,
+    "filters": "hue=s=0",
+    "transitions": "fade"
+  },
+  "Cautionary": {
+    "font": "fonts/RobotoCondensed-Regular.ttf",
+    "fontColor": "red",
+    "textPosition": "bottom",
+    "fadeIn": 0.5,
+    "fadeOut": 0.5,
+    "filters": "eq=saturation=0.7:contrast=1.1",
+    "transitions": "wipeleft"
+  },
+  "Sorrowful": {
+    "font": "fonts/Lora-Regular.ttf",
+    "fontColor": "lightgray",
+    "textPosition": "center",
+    "fadeIn": 2,
+    "fadeOut": 2,
+    "filters": "eq=brightness=0.7:saturation=0.5",
+    "transitions": "fade"
+  },
+  "Humble & Grounded": {
+    "font": "fonts/Ubuntu-Regular.ttf",
+    "fontColor": "#A1887F",
+    "textPosition": "bottom",
+    "fadeIn": 1,
+    "fadeOut": 1,
+    "filters": "eq=contrast=1.0:saturation=0.9",
+    "transitions": "simplecut"
+  },
+  "Defiant & Rebellious": {
+    "font": "fonts/BebasNeue-Regular.ttf",
+    "fontColor": "#FF5722",
+    "textPosition": "top",
+    "fadeIn": 0.3,
+    "fadeOut": 0.3,
+    "filters": "eq=contrast=1.5:saturation=1.5",
+    "transitions": "glitch"
+  },
+  "Compassionate": {
+    "font": "fonts/Pacifico-Regular.ttf",
+    "fontColor": "#FFCDD2",
+    "textPosition": "center",
+    "fadeIn": 1,
+    "fadeOut": 1,
+    "filters": "eq=brightness=1.0:saturation=1.2",
+    "transitions": "dissolve"
+  }
+}

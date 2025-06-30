@@ -1,3 +1,14 @@
+# Runtime-generated or final outputs
 final.mp4
-artifacts/
+temp_combined.mp4
+hook.txt
+concatlist.txt
 
+# Compiled or cached files
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+
+test.sh
