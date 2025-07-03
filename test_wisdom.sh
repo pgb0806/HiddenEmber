@@ -100,7 +100,9 @@ echo "🟢 Final calculated duration: $FINAL_DURATION sec"
 VIDEO_DURATION=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$VIDEO")
 if (( $(echo "$VIDEO_DURATION < $FINAL_DURATION" | bc -l) )); then
   echo "⚠️ Video too short, combining with another random"
-  SECOND_VIDEO=$(find "assets/$MOOD/background" -type f ! -name "$(basename "$VIDEO")" | shuf -n1)
+  SECOND_VIDEO=$(shuf -n1 assets/$MOOD/background/urls.txt)
+  gdown --fuzzy "https://drive.google.com/uc?id=$SECOND_VIDEO" -O second_video.mp4
+  SECOND_VIDEO="second_video.mp4"
   echo "🟢 Adding second video: $SECOND_VIDEO"
 
   echo -e "file '$VIDEO'\nfile '$SECOND_VIDEO'" > concatlist.txt
