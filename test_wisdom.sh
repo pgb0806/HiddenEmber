@@ -8,9 +8,17 @@ MOODS=("Resolute")
 MOOD="${MOODS[$((RANDOM % ${#MOODS[@]}))]}"
 echo "🟢 Mood chosen: $MOOD"
 
-# 2️⃣ Pick random video and music from assets
-VIDEO=$(find "assets/$MOOD/background" -type f | shuf -n1)
-MUSIC=$(find "assets/$MOOD/music" -type f | shuf -n1)
+# pick a random Drive file ID from urls.txt
+VIDEO_ID=$(shuf -n1 assets/$MOOD/background/urls.txt)
+MUSIC_ID=$(shuf -n1 assets/$MOOD/music/urls.txt)
+
+# download from Drive with gdown
+gdown --fuzzy "https://drive.google.com/uc?id=$VIDEO_ID" -O video.mp4
+gdown --fuzzy "https://drive.google.com/uc?id=$MUSIC_ID" -O music.wav
+
+VIDEO="video.mp4"
+MUSIC="music.wav"
+
 
 echo "🟢 Video chosen: $VIDEO"
 echo "🟢 Music chosen: $MUSIC"
@@ -29,12 +37,12 @@ fi
 
 # 4️⃣ Hooks
 HOOKS=(
+  "They never taught you this…"
+  "Read this before you decide…"
+  "Most people get this wrong…"
+  "Here’s what nobody tells you…"
+  "Break this rule to win…"
   "Before you act, hear this…"
-  "This might change your path…"
-  "Wisdom for warriors and kings…"
-  "Let this rewire your strategy…"
-  "A truth most ignore, revealed…"
-  "Arm your mind before the battle…"
 )
 HOOK="${HOOKS[$((RANDOM % ${#HOOKS[@]}))]}"
 echo "$HOOK" > hook.txt
@@ -68,8 +76,8 @@ echo "🟢 Detected $CHUNK_COUNT text chunks"
 
 # 7️⃣ Timing setup
 INTRO="hook.txt"
-OUTRO="Follow for daily wisdom @HiddenEmber"
-WATERMARK="@HiddenEmber"
+OUTRO="Follow for daily wisdom @HiddenEmber-v3p"
+WATERMARK="@HiddenEmber-v3p"
 CTA="Double tap if you agree"
 
 INTRO_DURATION=2

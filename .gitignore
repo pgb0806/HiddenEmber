@@ -12,3 +12,8 @@ concatlist.txt
 .DS_Store
 
 test.sh
+
+*.py
+
+assets/**/background/*.mp4
+assets/**/music/*.wav
