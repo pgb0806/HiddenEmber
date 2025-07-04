@@ -26,29 +26,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: ⚔️ Checkout
         uses: actions/checkout@v4
 
-      - name: Setup
-        run: sudo apt-get update && sudo apt-get install -y jq  bc ffmpeg
-        
-      - name: Install gdown
-        run: pip install gdown
-
-
-      - name: Generate Wisdom Video
+      - name: ⚙️ Install dependencies
         run: |
-          echo '{ 
-            "text": "${{ github.event.inputs.text }}",
-            "author": "${{ github.event.inputs.author }}",
-            "reference": "${{ github.event.inputs.reference }}",
-            "mood": "${{ github.event.inputs.mood }}"
-          }' > input.json
+          sudo apt-get update
+          sudo apt-get install -y jq bc ffmpeg python3-pip
+          pip install gdown
 
+      - name: 📝 Create input.json
+        run: |
+          echo "{\"text\": \"${{ github.event.inputs.text }}\", \"author\": \"${{ github.event.inputs.author }}\", \"reference\": \"${{ github.event.inputs.reference }}\", \"mood\": \"${{ github.event.inputs.mood }}\"}" > input.json
+
+      - name: ⚔️ Run wisdom generator
+        run: |
           chmod +x ./test_wisdom.sh
           ./test_wisdom.sh
 
-      - name: Upload
+      - name: 📤 Upload
         uses: actions/upload-artifact@v4
         with:
           name: final
