@@ -53,13 +53,13 @@ TEXT=$(jq -r '.text' "$INPUT_JSON")
 AUTHOR=$(jq -r '.author // empty' "$INPUT_JSON")
 REFERENCE=$(jq -r '.reference // empty' "$INPUT_JSON")
 
-if [[ -n "$AUTHOR" && -n "$REFERENCE" ]]; then
-  TEXT="$TEXT - $AUTHOR, $REFERENCE"
-elif [[ -n "$AUTHOR" ]]; then
-  TEXT="$TEXT - $AUTHOR"
-elif [[ -n "$REFERENCE" ]]; then
-  TEXT="$TEXT - $REFERENCE"
-fi
+# if [[ -n "$AUTHOR" && -n "$REFERENCE" ]]; then
+#   TEXT="$TEXT - $AUTHOR, $REFERENCE"
+# elif [[ -n "$AUTHOR" ]]; then
+#   TEXT="$TEXT - $AUTHOR"
+# elif [[ -n "$REFERENCE" ]]; then
+#   TEXT="$TEXT - $REFERENCE"
+# fi
 
 echo "🟢 Final text for video: $TEXT"
 
