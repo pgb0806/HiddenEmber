@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 set -e
 
-echo "⚔️ TESTING WISDOM SHORTS LOCALLY WITH EYE-OPTIMIZED DRAW + POWERFUL HOOK + CONSISTENT BOXCOLOR"
+echo "⚔️ TESTING WISDOM SHORTS LOCALLY WITH CUMULATIVE STACK + HOOK ALWAYS ON + CONSISTENT BOXCOLOR"
 
 # 1️⃣ Pick mood
 MOODS=("Resolute")
 MOOD="${MOODS[$((RANDOM % ${#MOODS[@]}))]}"
 echo "🟢 Mood chosen: $MOOD"
 
-# random Drive ID from urls.txt
+# random Drive IDs from urls.txt
 VIDEO_ID=$(shuf -n1 assets/$MOOD/background/urls.txt)
 MUSIC_ID=$(shuf -n1 assets/$MOOD/music/urls.txt)
 
-# download
+# download from Drive
 gdown --fuzzy "https://drive.google.com/uc?id=$VIDEO_ID" -O video.mp4
 gdown --fuzzy "https://drive.google.com/uc?id=$MUSIC_ID" -O music.wav
 
@@ -53,13 +53,16 @@ TEXT=$(jq -r '.text' "$INPUT_JSON")
 AUTHOR=$(jq -r '.author // empty' "$INPUT_JSON")
 REFERENCE=$(jq -r '.reference // empty' "$INPUT_JSON")
 
-# if [[ -n "$AUTHOR" && -n "$REFERENCE" ]]; then
-#   TEXT="$TEXT - $AUTHOR, $REFERENCE"
-# elif [[ -n "$AUTHOR" ]]; then
-#   TEXT="$TEXT - $AUTHOR"
-# elif [[ -n "$REFERENCE" ]]; then
-#   TEXT="$TEXT - $REFERENCE"
-# fi
+# compose final text
+if [[ -n "$AUTHOR" && -n "$REFERENCE" ]]; then
+  AUTHOR_AND_REF="$AUTHOR, $REFERENCE"
+elif [[ -n "$AUTHOR" ]]; then
+  AUTHOR_AND_REF="$AUTHOR"
+elif [[ -n "$REFERENCE" ]]; then
+  AUTHOR_AND_REF="$REFERENCE"
+else
+  AUTHOR_AND_REF=""
+fi
 
 echo "🟢 Final text for video: $TEXT"
 
@@ -90,17 +93,17 @@ for ((i=0; i<CHUNK_COUNT; i++)); do
   STARTS+=($start)
   start=$(echo "$start + $FADEIN + $HOLD + $FADEOUT + $PAUSE_AFTER" | bc)
 done
-
 FINAL_DURATION=$(echo "${STARTS[-1]} + $FADEIN + $HOLD + $FADEOUT + 3" | bc)
+
 echo "🟢 Final duration: $FINAL_DURATION sec"
 
 # 7️⃣ Eye-optimized positions
-HOOK_Y="(h/3 - text_h/2)"
+HOOK_Y="(h/5 - text_h/2)"
 CONTENT_Y="(h/2 - text_h/2 - 50)"
-AUTHOR_Y="(h/2 + text_h/2 + 20)"
-OUTRO_Y="(2*h/3 - text_h/2)"
+AUTHOR_Y="(h*3/4 - text_h/2)"
+OUTRO_Y="(h*4/5 - text_h/2)"
 
-# 8️⃣ Concat video if too short
+# 8️⃣ Video concat if too short
 VIDEO_DURATION=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$VIDEO")
 if (( $(echo "$VIDEO_DURATION < $FINAL_DURATION" | bc -l) )); then
   SECOND_VIDEO_ID=$(shuf -n1 assets/$MOOD/background/urls.txt)
@@ -108,22 +111,26 @@ if (( $(echo "$VIDEO_DURATION < $FINAL_DURATION" | bc -l) )); then
   echo -e "file '$VIDEO'\nfile 'second_video.mp4'" > concatlist.txt
   ffmpeg -hide_banner -y -f concat -safe 0 -i concatlist.txt -c copy temp_combined.mp4
   VIDEO="temp_combined.mp4"
+  echo "🟢 Video extended with second segment"
 fi
 
-# 9️⃣ Build drawtext
-DRAW_TEXTS="drawtext=textfile='$INTRO':fontfile=$FONT:fontsize=64:fontcolor=$COLOR:box=1:boxcolor=$BOXCOLOR:boxborderw=12:x=(w-text_w)/2:y=$HOOK_Y:enable='lt(t,$INTRO_DURATION)',"
+# 9️⃣ Drawtext
+# hook stays visible for entire video
+DRAW_TEXTS="drawtext=textfile='$INTRO':fontfile=$FONT:fontsize=64:fontcolor=$COLOR:box=1:boxcolor=$BOXCOLOR:boxborderw=12:x=(w-text_w)/2:y=$HOOK_Y:enable='between(t,0,$FINAL_DURATION)',"
 
+# cumulative stacked chunks
 for ((i=0; i<CHUNK_COUNT; i++)); do
-  alpha_expr="if(lt(t,${STARTS[i]}+$FADEIN),(t-${STARTS[i]})/$FADEIN,if(lt(t,${STARTS[i]}+$FADEIN+$HOLD),1,if(lt(t,${STARTS[i]}+$FADEIN+$HOLD+$FADEOUT),1-(t-(${STARTS[i]}+$FADEIN+$HOLD))/$FADEOUT,0)))"
-  DRAW_TEXTS+="drawtext=text='${CHUNKS[i]}':fontfile=$FONT:fontsize=48:fontcolor=$COLOR:x=(w-text_w)/2:y=$CONTENT_Y:alpha='$alpha_expr':box=1:boxcolor=$BOXCOLOR:boxborderw=10,"
+  chunk_y="($CONTENT_Y + $((i * 60)))"
+  DRAW_TEXTS+="drawtext=text='${CHUNKS[i]}':fontfile=$FONT:fontsize=48:fontcolor=$COLOR:x=(w-text_w)/2:y=$chunk_y:enable='gte(t,${STARTS[i]})':box=1:boxcolor=$BOXCOLOR:boxborderw=10,"
 done
 
-if [[ -n "$AUTHOR" || -n "$REFERENCE" ]]; then
-  AUTHOR_AND_REF="$AUTHOR, $REFERENCE"
+# author + ref if present
+if [[ -n "$AUTHOR_AND_REF" ]]; then
   DRAW_TEXTS+="drawtext=text='$AUTHOR_AND_REF':fontfile=$FONT:fontsize=36:fontcolor=$COLOR:x=(w-text_w)/2:y=$AUTHOR_Y:enable='between(t,$INTRO_DURATION,$FINAL_DURATION)',"
 fi
 
-DRAW_TEXTS+="drawtext=text='$OUTRO':fontfile=$FONT:fontsize=42:fontcolor=$COLOR:box=1:boxcolor=$BOXCOLOR:boxborderw=10:x=(w-text_w)/2:y=$OUTRO_Y:enable='between(t,${FINAL_DURATION}-3,${FINAL_DURATION})',"
+# outro, watermark, cta
+DRAW_TEXTS+="drawtext=text='$OUTRO':fontfile=$FONT:fontsize=42:fontcolor=$COLOR:box=1:boxcolor=$BOXCOLOR:boxborderw=10:x=(w-text_w)/2:y=$OUTRO_Y:enable='between(t,${FINAL_DURATION}-3,$FINAL_DURATION)',"
 DRAW_TEXTS+="drawtext=text='$WATERMARK':fontfile=$FONT:fontsize=24:fontcolor=white@0.7:x=w-tw-30:y=40:enable='between(t,0,$FINAL_DURATION)',"
 DRAW_TEXTS+="drawtext=text='$CTA':fontfile=$FONT:fontsize=28:fontcolor=white@0.9:x=30:y=40:enable='between(t,$INTRO_DURATION,$FINAL_DURATION)'"
 
@@ -154,5 +161,5 @@ else
     final.mp4
 fi
 
-echo "✅ Wisdom video generated with eye-optimized layout — empire ready."
+echo "✅ Final wisdom video generated with cumulative stacked chunks + hook visible entire video — empire ready."
 echo "▶️ Play with: ffplay final.mp4"
