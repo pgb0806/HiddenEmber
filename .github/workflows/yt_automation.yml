@@ -7,14 +7,19 @@ on:
         description: "Main wisdom text"
         required: true
         type: string
+
       author:
         description: "Author (optional)"
         required: false
+        default: ""
         type: string
+
       reference:
         description: "Reference (optional)"
         required: false
+        default: ""
         type: string
+
       mood:
         description: "Mood to drive video choice"
         required: false
@@ -25,27 +30,82 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    timeout-minutes: 30
+
     steps:
+
+      # --------------------------------------------------
+      # Checkout
+      # --------------------------------------------------
+
       - name: ⚔️ Checkout
         uses: actions/checkout@v4
+
+      # --------------------------------------------------
+      # Dependencies
+      # --------------------------------------------------
 
       - name: ⚙️ Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq bc ffmpeg python3-pip
-          pip install gdown
+
+          sudo apt-get install -y \
+            jq \
+            bc \
+            ffmpeg \
+            python3-pip
+
+          pip install --upgrade pip
+          pip install --upgrade gdown
+
+      # --------------------------------------------------
+      # Create JSON safely
+      # --------------------------------------------------
 
       - name: 📝 Create input.json
         run: |
-          echo "{\"text\": \"${{ github.event.inputs.text }}\", \"author\": \"${{ github.event.inputs.author }}\", \"reference\": \"${{ github.event.inputs.reference }}\", \"mood\": \"${{ github.event.inputs.mood }}\"}" > input.json
+          cat > input.json <<EOF
+          {
+            "text": ${{ toJson(github.event.inputs.text) }},
+            "author": ${{ toJson(github.event.inputs.author) }},
+            "reference": ${{ toJson(github.event.inputs.reference) }},
+            "mood": ${{ toJson(github.event.inputs.mood) }}
+          }
+          EOF
+
+      # --------------------------------------------------
+      # Debug JSON
+      # --------------------------------------------------
+
+      - name: 🔍 Show input.json
+        run: |
+          cat input.json
+
+      # --------------------------------------------------
+      # Run generator
+      # --------------------------------------------------
 
       - name: ⚔️ Run wisdom generator
         run: |
           chmod +x ./test_wisdom.sh
           ./test_wisdom.sh
 
-      - name: 📤 Upload
+      # --------------------------------------------------
+      # Verify output
+      # --------------------------------------------------
+
+      - name: ✅ Verify output
+        run: |
+          ls -lh
+          test -f final.mp4
+
+      # --------------------------------------------------
+      # Upload artifact
+      # --------------------------------------------------
+
+      - name: 📤 Upload video
         uses: actions/upload-artifact@v4
         with:
           name: final
           path: final.mp4
+          retention-days: 30
